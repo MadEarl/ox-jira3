@@ -28,7 +28,7 @@
 ;; This module plugs into the regular Org Export Engine and transforms Org
 ;; files to JIRA markup for pasting into JIRA tickets & comments.
 
-;; In an Org buffer, hit `C-c C-e j j' to bring up *Org Export Dispatcher*
+;; In an Org buffer, hit `C-c C-e J j' to bring up *Org Export Dispatcher*
 ;; and export it as a JIRA buffer. I usually use `C-x h' to mark the whole
 ;; buffer, then `M-w' to save it to the kill ring (and global pasteboard) for
 ;; pasting into JIRA issues.
@@ -39,6 +39,7 @@
 (require 'ox)
 (require 'ox-publish)
 (require 'subr-x)
+(require 's)
 
 ;;; User Configurable Options
 
@@ -174,14 +175,29 @@ could set this to `2' to start headings at level 3."
 ;; all in one go, let's put a big fat red marker in for things we have
 ;; not implemented yet, to avoid missing it.
 
+(defun ox-jira-jsonp (string)
+  "Validates a JSON string."
+  (condition-case nil
+      (progn
+        (json-read-from-string string)
+        t)
+    (error nil)))
+
 (defun ox-jira-make-adf-item (key value &optional nowrap)
   "Create a json property as string."
-  (if (or (eq key 'content)
-          (eq key 'marks)
-          (eq key 'attrs)
-          nowrap)
-      (cl-format nil  "\"~a\":~a" key value)
-    (cl-format nil  "\"~a\":\"~a\"" key value)))
+  (message (cl-format nil "~a" value))
+  (cond ((or (eq key 'content)
+         (eq key 'marks)
+         (eq key 'attrs)
+         (numberp value)
+         nowrap)
+         (cl-format nil  "\"~a\":~a" key (if (stringp value)
+                                             (s-trim value)
+                                           value)))
+        ((and (stringp value)
+              (ox-jira-jsonp value))
+         value)
+        (t (cl-format nil  "\"~a\":\"~a\"" key (s-trim value)))))
 
 (defun ox-jira-make-adf-object (&rest args)
   "Create a json object as string."
@@ -199,12 +215,16 @@ could set this to `2' to start headings at level 3."
 (defun ox-jira-make-adf-doc (&rest args)
   "Create an ADF document structure in lisp,
 to be converted by json-encode."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'version 1)
-   (ox-jira-make-adf-item 'type "doc")
-   (ox-jira-make-adf-item
-    'content (ox-jira-make-adf-vector
-              (cl-format nil "~{~a~^,~}" args)))))
+  (replace-regexp-in-string
+   "}{" "},{" 
+   (replace-regexp-in-string
+    "\n" ""
+    (ox-jira-make-adf-object
+     (ox-jira-make-adf-item 'version 1)
+     (ox-jira-make-adf-item 'type "doc")
+     (ox-jira-make-adf-item
+      'content (ox-jira-make-adf-vector
+                (cl-format nil "~{~a~^,~}" args)))))))
 
 (defun ox-jira--not-implemented (element-type)
   "Replace anything we don't handle yet with a big red marker."
@@ -381,7 +401,7 @@ the plist used as a communication channel."
            (ox-jira-make-adf-vector
             (ox-jira-make-adf-object 
              (ox-jira-make-adf-item 'type "text")
-             (ox-jira-make-adf-item 'text (format "%s %s" todo-text title))))))))
+             (ox-jira-make-adf-item 'text (format "%s %s" todo-text (s-trim title)))))))))
 
 (defun ox-jira-horizontal-rule (horizontal-rule contents info)
   "Transcode a HORIZONTAL-RULE element from Org to JIRA."
@@ -499,7 +519,7 @@ INFO is a plist holding contextual information.  See
         'attrs
         (ox-jira-make-adf-object
          (ox-jira-make-adf-item 'id path)
-         (ox-jira-make-adf-item 'text (format nil "@~a" desc))))))
+         (ox-jira-make-adf-item 'text (cl-format nil "@~a" desc))))))
      (t
       (ox-jira-make-adf-object
        (ox-jira-make-adf-item 'type "text")
@@ -545,7 +565,7 @@ the plist used as a communication channel."
     (ox-jira-make-adf-vector
      (ox-jira-make-adf-object 
       (ox-jira-make-adf-item 'type "text")
-      (ox-jira-make-adf-item 'text (json-serialize contents) t)))
+      (ox-jira-make-adf-item 'text (json-serialize (s-trim contents)) t)))
     t )))
 
 ;; Lists are simple to support since all the complexity is in the code
@@ -579,12 +599,12 @@ contextual information."
 CONTENTS is the contents of the section, as a string.  INFO is
 the plist used as a communication channel."
   (ox-jira-make-adf-doc contents))
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "paragraph")
-   (ox-jira-make-adf-item
-    'content
-    (ox-jira-make-adf-vector
-     contents))))
+  ;; (ox-jira-make-adf-object
+  ;;  (ox-jira-make-adf-item 'type "paragraph")
+  ;;  (ox-jira-make-adf-item
+  ;;   'content
+  ;;   (ox-jira-make-adf-vector
+  ;;    contents))))
 
 ;; If language is not member of =ox-jira-src-supported-languages=,
 ;; =none=, will be used which I imagine will be a bit like
