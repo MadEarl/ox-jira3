@@ -1,8 +1,12 @@
-#+TITLE: JIRA Backend for Org Export Engine
-#+AUTHOR: Stig Brautaset
+#+TITLE: JIRA API v3 Backend for Org Export Engine
+#+AUTHOR: Wolfgang Mederle
 
-  [[http://melpa.org/#/ox-jira][file:http://melpa.org/packages/ox-jira-badge.svg]]
-  [[https://dl.circleci.com/status-badge/redirect/gh/stig/ox-jira.el/tree/trunk][file:https://dl.circleci.com/status-badge/img/gh/stig/ox-jira.el/tree/trunk.svg?style=svg]]
+* Notice
+
+This is a fork of Stig Brautaset's ox-jira, which I am working on to support Atlassian's Jira API v3. This API uses Atlassian Document Format instead of markup syntax.
+
+This is currently not a finished version, I am actively developing it, so, to put it simple: don't use yet. And ignore the rest of this README.
+
 
 * Introduction
 
