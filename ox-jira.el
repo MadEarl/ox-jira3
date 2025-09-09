@@ -183,6 +183,24 @@ could set this to `2' to start headings at level 3."
         t)
     (error nil)))
 
+(defun ox-jira--intern-special-chars (string)
+  "Translates whitespace operators to their ansi equivalents in string.
+This means replacing '\n' with '\\n', '\t' with '\\t', and escaping quotes and backslashes"
+  (cl-loop for (item replacement) in
+           '(("\\" "\\\\\\\\") ("\n" "\\\\n") ("\t" "\\\\t") ("\"" "\\\\\""))
+           with result = string do
+           (setf result (replace-regexp-in-string item replacement result))
+           finally (return result)))
+
+(defun ox-jira--unintern-special-chars (string)
+  "Translate special characters to their unescaped equivalents in string.
+This means replacing '\\n' with '\n' and '\\t' with '\t' and unescaping escaped characters."
+  (cl-loop for (item replacement) in
+           '(("\\\\n" "\n") ("\\\\t" "\t") ("\\\\\"" "\"")); ("\\\\\\\\" "\\"))
+           with result = string do
+           (setf result (replace-regexp-in-string item replacement result))
+           finally (return result)))
+
 (defun ox-jira-make-adf-item (key value &optional nowrap)
   "Create a json property as string."
   (message (cl-format nil "~a" value))
@@ -194,8 +212,6 @@ could set this to `2' to start headings at level 3."
          (cl-format nil  "\"~a\":~a" key (if (stringp value)
                                              (s-trim value)
                                            value)))
-        ((stringp value)
-         value)
         (t (cl-format nil  "\"~a\":\"~a\"" key (s-trim value)))))
 
 (defun ox-jira-make-adf-object (&rest args)
@@ -589,6 +605,7 @@ contextual information."
   (replace-regexp-in-string "\\([[{]\\)"
                             '(lambda (p) (format "\\\\%s" p))
                             text))
+
 ;; Paragraphs are grouped into sections. I've not found any mention in
 ;; the Org documentation, but it appears to be essential for any
 ;; export to happen. I've essentially cribbed this from =ox-latex.el=.
