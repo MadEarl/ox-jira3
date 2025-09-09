@@ -203,7 +203,7 @@ This means replacing '\\n' with '\n' and '\\t' with '\t' and unescaping escaped 
 
 (defun ox-jira-make-adf-item (key value &optional nowrap)
   "Create a json property as string."
-  (message (cl-format nil "~a: ~a~%" key value))
+  ;; (message (cl-format nil "~a: ~a~%" key value))
   (cond ((or (eq key 'content)
          (eq key 'marks)
          (eq key 'attrs)
