@@ -194,8 +194,7 @@ could set this to `2' to start headings at level 3."
          (cl-format nil  "\"~a\":~a" key (if (stringp value)
                                              (s-trim value)
                                            value)))
-        ((and (stringp value)
-              (ox-jira-jsonp value))
+        ((stringp value)
          value)
         (t (cl-format nil  "\"~a\":\"~a\"" key (s-trim value)))))
 
@@ -463,7 +462,7 @@ contextual information."
                      (trans "(i)"))))
     (ox-jira-make-adf-object
      (ox-jira-make-adf-item 'type "listItem")
-     (ox-jira-make-adf-item
+     (ox-jira-make-adf-item 
       'content
       (ox-jira-make-adf-vector
        (ox-jira-make-adf-object
