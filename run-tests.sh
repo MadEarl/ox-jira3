@@ -2,6 +2,6 @@
 
 emacs -q \
       --batch \
-      -l ox-jira.el \
+      -l ox-jira3.el \
       -l test/ox-jira-test.el \
       -f ert-run-tests-batch-and-exit

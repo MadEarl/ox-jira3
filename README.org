@@ -1,5 +1,6 @@
 #+TITLE: JIRA API v3 Backend for Org Export Engine
 #+AUTHOR: Wolfgang Mederle
+#+Startup: indent
 
 * Notice
 
@@ -10,22 +11,31 @@ This is currently not a finished version, I am actively developing it, so, to pu
 
 * Introduction
 
-  This module plugs into the regular Org Export Engine and transforms Org
-  files to JIRA markup for pasting into JIRA tickets & comments.
+This module plugs into the regular Org Export Engine and transforms Org files to JIRA markup for pasting into Jira tickets & comments.
 
-  My last three jobs I've had to use JIRA, and had to deal with its (to me)
-  incredibly unintuitive markup format. Having discovered---and fallen in
-  love with---Org mode I now find myself writing everything in Org and
-  exporting to various other formats (html, markdown, plain text) but I
-  haven't been able to find a way to export to JIRA. So I am attempting to
-  write one, and learn about Emacs package development at the same time.
+It is also required for ejira3 to export tickets from Org do Jira.
 
+The code is forked from Stig Brautaset's ox-jira and adapted to work with Jira API version 3. This version of the API replaces Jira markup with Atlassian Document Format, a JSON format described [[https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/][here]].
+
+I am working with the module daily, but consider it alpha. Not everything is implemented yet. What should work:
+
+- text
+- styled text (bold, italic, strikethrough, underline)
+- code blocks
+- verbatim and example blocks
+- links
+- mentions (via e. g. ejira3-mention-user, mentions require the person's ID)
+- plain lists (numbered are converted to plain)
+- tables
+  
 * Usage
 
-  In an Org buffer, hit =C-c C-e j j= to bring up =*Org Export Dispatcher*=
+  In an Org buffer, hit =C-c C-e J j= to bring up =*Org Export Dispatcher*=
   and export it as a JIRA buffer. You can then use =C-x h= to mark the whole
   buffer, then =M-w= to save it to the kill ring (and global pasteboard) for
   pasting into JIRA issues.
+
+  (ox-jira used =C-c C-e j j=, but this is also used in ox-json.)
 
   Alternatively, you can export to the kill ring automatically for
   interactive exports by setting this in your =.emacs.el= file:
@@ -36,18 +46,14 @@ This is currently not a finished version, I am actively developing it, so, to pu
 
 * Installation
 
-  This library is on Melpa. You can install it like this:
-
-  #+BEGIN_EXAMPLE
-  M-x package-install RET ox-jira RET
-  #+END_EXAMPLE
+  This library is not on Melpa. For now, you need to install it manually.
 
 * Manual installation
 
-  If you don't want to install from Melpa, simply clone this repo and do:
+  Since you cannot install it from Melpa, simply clone this repo and do:
 
   #+BEGIN_EXAMPLE
-  M-x load-file RET ox-jira.el RET
+  M-x load-file RET ox-jira3.el RET
   #+END_EXAMPLE
 
 * Maturity
@@ -56,7 +62,7 @@ This is currently not a finished version, I am actively developing it, so, to pu
 
 * License
 
-  Copyright (C) 2016 Stig Brautaset
+  Copyright (C) 2025 Wolfgang Mederle
 
   This program is free software: you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the Free
@@ -82,4 +88,4 @@ This is currently not a finished version, I am actively developing it, so, to pu
   reproducible test case, like "I expected this but got this" is also a
   valuable contribution.
 
-  Running the =./run-tests.sh= script should run all the tests automatically.
+  The tests are still testing for Jira markup syntax and will fail.

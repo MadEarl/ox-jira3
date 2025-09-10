@@ -41,7 +41,7 @@
 (require 'ox)
 (require 'ox-publish)
 (require 'subr-x)
-(require 's)
+;; (require 's)
 
 ;;; User Configurable Options
 

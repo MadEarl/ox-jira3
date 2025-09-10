@@ -24,7 +24,7 @@
 (require 'ert)
 (require 'org-element)
 (require 'ox)
-(require 'ox-jira)
+(require 'ox-jira3)
 (eval-when-compile
   (require 'cl-lib))
 
