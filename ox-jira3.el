@@ -1,12 +1,14 @@
-;;; ox-jira.el --- JIRA Backend for Org Export Engine
+;;; ox-jira3.el --- JIRA Backend for Org Export Engine
 
-;; Copyright (C) 2016-2020 Stig Brautaset
+;; Copyright (C) 2025 Wolfgang Mederle
 
-;; Author: Stig Brautaset <stig@brautaset.org>
-;; Version: 0.1-SNAPSHOT
+;; Author: Wolfgang Mederle <jungleoutthere@mederle.de>
+;; Version: 0.1
 ;; Keywords: outlines, hypermedia, wp
-;; Homepage: https://github.com/stig/ox-jira.el
+;; Homepage: https://github.com/MadEarl/ox-jira3.el
 ;; Package-Requires: ((org "8.3"))
+
+;; Based on ox-jira https://github.com/stig/ox-jira.el written by Stig Brautaset.
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -43,19 +45,19 @@
 
 ;;; User Configurable Options
 
-(defgroup ox-jira-export nil
+(defgroup ox-jira3-export nil
   "Options specific to JIRA export back-end."
   :tag "Org Export JIRA"
   :group 'org-export
   :version "24.4"
-  :package-version '(ox-jira . "0.1"))
+  :package-version '(ox-jira3 . "0.1"))
 
-(defcustom ox-jira-src-collapse-threshold 30
+(defcustom ox-jira3-src-collapse-threshold 30
   "Minimum number of lines in a src block to set collapse=true in JIRA/Confluence {code} block."
   :group 'ox-export-jira
   :type '(integer))
 
-(defcustom ox-jira-src-supported-languages
+(defcustom ox-jira3-src-supported-languages
   '("actionscript"
     "ada"
     "applescript"
@@ -95,7 +97,7 @@
 ;; preview before collapsing the rest is up to individual taste, so
 ;; let's make it configurable.
 
-(defcustom ox-jira-override-headline-offset nil
+(defcustom ox-jira3-override-headline-offset nil
   "Use this to override the (default) relative headline levels.
 
 If you want to have the headings *real* heading level in
@@ -109,65 +111,65 @@ could set this to `2' to start headings at level 3."
 ;;; Defining Backend
 
 (org-export-define-backend 'jira
-  '((babel-call . (lambda (&rest args) (ox-jira--not-implemented 'babel-call)))
-    (body . (lambda (&rest args) (ox-jira--not-implemented 'body)))
-    (bold . ox-jira-bold)
-    (center-block . (lambda (&rest args) (ox-jira--not-implemented 'center-block)))
-    (clock . (lambda (&rest args) (ox-jira--not-implemented 'clock)))
-    (code . ox-jira-code)
-    (diary-sexpexample-block . (lambda (&rest args) (ox-jira--not-implemented 'diary-sexpexample-block)))
-    (drawer . (lambda (&rest args) (ox-jira--not-implemented 'drawer)))
-    (dynamic-block . (lambda (&rest args) (ox-jira--not-implemented 'dynamic-block)))
-    (entity . (lambda (&rest args) (ox-jira--not-implemented 'entity)))
-    (example-block . ox-jira-example-block)
-    (export-block . (lambda (&rest args) (ox-jira--not-implemented 'export-block)))
-    (export-snippet . (lambda (&rest args) (ox-jira--not-implemented 'export-snippet)))
-    (final-output . (lambda (&rest args) (ox-jira--not-implemented 'final-output)))
-    (fixed-width . ox-jira-fixed-width)
-    (footnote-definition . ox-jira-footnote-definition)
-    (footnote-reference . ox-jira-footnote-reference)
-    (headline . ox-jira-headline)
-    (horizontal-rule . ox-jira-horizontal-rule)
-    (inline-babel-call . (lambda (&rest args) (ox-jira--not-implemented 'inline-babel-call)))
-    (inline-src-block . (lambda (&rest args) (ox-jira--not-implemented 'inline-src-block)))
-    (inlinetask . (lambda (&rest args) (ox-jira--not-implemented 'inlinetask)))
-    (italic . ox-jira-italic)
-    (item . ox-jira-item)
+  '((babel-call . (lambda (&rest args) (ox-jira3--not-implemented 'babel-call)))
+    (body . (lambda (&rest args) (ox-jira3--not-implemented 'body)))
+    (bold . ox-jira3-bold)
+    (center-block . (lambda (&rest args) (ox-jira3--not-implemented 'center-block)))
+    (clock . (lambda (&rest args) (ox-jira3--not-implemented 'clock)))
+    (code . ox-jira3-code)
+    (diary-sexpexample-block . (lambda (&rest args) (ox-jira3--not-implemented 'diary-sexpexample-block)))
+    (drawer . (lambda (&rest args) (ox-jira3--not-implemented 'drawer)))
+    (dynamic-block . (lambda (&rest args) (ox-jira3--not-implemented 'dynamic-block)))
+    (entity . (lambda (&rest args) (ox-jira3--not-implemented 'entity)))
+    (example-block . ox-jira3-example-block)
+    (export-block . (lambda (&rest args) (ox-jira3--not-implemented 'export-block)))
+    (export-snippet . (lambda (&rest args) (ox-jira3--not-implemented 'export-snippet)))
+    (final-output . (lambda (&rest args) (ox-jira3--not-implemented 'final-output)))
+    (fixed-width . ox-jira3-fixed-width)
+    (footnote-definition . ox-jira3-footnote-definition)
+    (footnote-reference . ox-jira3-footnote-reference)
+    (headline . ox-jira3-headline)
+    (horizontal-rule . ox-jira3-horizontal-rule)
+    (inline-babel-call . (lambda (&rest args) (ox-jira3--not-implemented 'inline-babel-call)))
+    (inline-src-block . (lambda (&rest args) (ox-jira3--not-implemented 'inline-src-block)))
+    (inlinetask . (lambda (&rest args) (ox-jira3--not-implemented 'inlinetask)))
+    (italic . ox-jira3-italic)
+    (item . ox-jira3-item)
     (keyword . (lambda (&rest args) ""))
-    (latex-environment . (lambda (&rest args) (ox-jira--not-implemented 'latex-environment)))
-    (latex-fragment . (lambda (&rest args) (ox-jira--not-implemented 'latex-fragment)))
-    (line-break . (lambda (&rest args) (ox-jira--not-implemented 'line-break)))
-    (link . ox-jira-link)
-    (node-property . (lambda (&rest args) (ox-jira--not-implemented 'node-property)))
-    (options . (lambda (&rest args) (ox-jira--not-implemented 'options)))
-    (paragraph . ox-jira-paragraph)
-    (parse-tree . (lambda (&rest args) (ox-jira--not-implemented 'parse-tree)))
-    (plain-list . ox-jira-plain-list)
-    (plain-text . ox-jira-plain-text)
-    (planning . (lambda (&rest args) (ox-jira--not-implemented 'planning)))
-    (property-drawer . (lambda (&rest args) (ox-jira--not-implemented 'property-drawer)))
-    (quote-block . ox-jira-quote-block)
-    (radio-target . ox-jira-radio-target)
-    (section . ox-jira-section)
-    (special-block . (lambda (&rest args) (ox-jira--not-implemented 'special-block)))
-    (src-block . ox-jira-src-block)
-    (statistics-cookie . ox-jira-statistics-cookie)
-    (strike-through . ox-jira-strike-through)
-    (subscript . ox-jira-subscript)
-    (superscript . ox-jira-superscript)
-    (table . ox-jira-table)
-    (table-cell . ox-jira-table-cell)
-    (table-row . ox-jira-table-row)
-    (target . (lambda (&rest args) (ox-jira--not-implemented 'target)))
-    (timestamp . ox-jira-timestamp)
-    (underline . ox-jira-underline)
-    (verbatim . ox-jira-verbatim)
-    (verse-block . (lambda (&rest args) (ox-jira--not-implemented 'verse-block))))
-;;  :filters-alist '((:filter-parse-tree . ox-jira-fix-multi-paragraph-items))
-  :options-alist '((:src-collapse-threshold nil nil ox-jira-src-collapse-threshold))
+    (latex-environment . (lambda (&rest args) (ox-jira3--not-implemented 'latex-environment)))
+    (latex-fragment . (lambda (&rest args) (ox-jira3--not-implemented 'latex-fragment)))
+    (line-break . (lambda (&rest args) (ox-jira3--not-implemented 'line-break)))
+    (link . ox-jira3-link)
+    (node-property . (lambda (&rest args) (ox-jira3--not-implemented 'node-property)))
+    (options . (lambda (&rest args) (ox-jira3--not-implemented 'options)))
+    (paragraph . ox-jira3-paragraph)
+    (parse-tree . (lambda (&rest args) (ox-jira3--not-implemented 'parse-tree)))
+    (plain-list . ox-jira3-plain-list)
+    (plain-text . ox-jira3-plain-text)
+    (planning . (lambda (&rest args) (ox-jira3--not-implemented 'planning)))
+    (property-drawer . (lambda (&rest args) (ox-jira3--not-implemented 'property-drawer)))
+    (quote-block . ox-jira3-quote-block)
+    (radio-target . ox-jira3-radio-target)
+    (section . ox-jira3-section)
+    (special-block . (lambda (&rest args) (ox-jira3--not-implemented 'special-block)))
+    (src-block . ox-jira3-src-block)
+    (statistics-cookie . ox-jira3-statistics-cookie)
+    (strike-through . ox-jira3-strike-through)
+    (subscript . ox-jira3-subscript)
+    (superscript . ox-jira3-superscript)
+    (table . ox-jira3-table)
+    (table-cell . ox-jira3-table-cell)
+    (table-row . ox-jira3-table-row)
+    (target . (lambda (&rest args) (ox-jira3--not-implemented 'target)))
+    (timestamp . ox-jira3-timestamp)
+    (underline . ox-jira3-underline)
+    (verbatim . ox-jira3-verbatim)
+    (verse-block . (lambda (&rest args) (ox-jira3--not-implemented 'verse-block))))
+;;  :filters-alist '((:filter-parse-tree . ox-jira3-fix-multi-paragraph-items))
+  :options-alist '((:src-collapse-threshold nil nil ox-jira3-src-collapse-threshold))
   :menu-entry
   '(?J "Export to JIRA"
-       ((?j "As JIRA buffer" ox-jira-export-as-jira))))
+       ((?j "As JIRA buffer" ox-jira3-export-as-jira))))
 
 ;;; Internal Helpers
 
@@ -175,7 +177,7 @@ could set this to `2' to start headings at level 3."
 ;; all in one go, let's put a big fat red marker in for things we have
 ;; not implemented yet, to avoid missing it.
 
-(defun ox-jira-jsonp (string)
+(defun ox-jira3-jsonp (string)
   "Validates a JSON string."
   (condition-case nil
       (progn
@@ -183,7 +185,7 @@ could set this to `2' to start headings at level 3."
         t)
     (error nil)))
 
-(defun ox-jira--intern-special-chars (string)
+(defun ox-jira3--intern-special-chars (string)
   "Translates whitespace operators to their ansi equivalents in string.
 This means replacing '\n' with '\\n', '\t' with '\\t', and escaping quotes and backslashes"
   (cl-loop for (item replacement) in
@@ -192,7 +194,7 @@ This means replacing '\n' with '\\n', '\t' with '\\t', and escaping quotes and b
            (setf result (replace-regexp-in-string item replacement result))
            finally (return result)))
 
-(defun ox-jira--unintern-special-chars (string)
+(defun ox-jira3--unintern-special-chars (string)
   "Translate special characters to their unescaped equivalents in string.
 This means replacing '\\n' with '\n' and '\\t' with '\t' and unescaping escaped characters."
   (cl-loop for (item replacement) in
@@ -201,7 +203,7 @@ This means replacing '\\n' with '\n' and '\\t' with '\t' and unescaping escaped 
            (setf result (replace-regexp-in-string item replacement result))
            finally (return result)))
 
-(defun ox-jira-make-adf-item (key value &optional nowrap)
+(defun ox-jira3-make-adf-item (key value &optional nowrap)
   "Create a json property as string."
   ;; (message (cl-format nil "~a: ~a~%" key value))
   (cond ((or (eq key 'content)
@@ -212,20 +214,20 @@ This means replacing '\\n' with '\n' and '\\t' with '\t' and unescaping escaped 
          (cl-format nil  "\"~a\":~a" key value))
         (t (cl-format nil  "\"~a\":\"~a\"" key value))))
 
-(defun ox-jira-make-adf-object (&rest args)
+(defun ox-jira3-make-adf-object (&rest args)
   "Create a json object as string."
   (if args
       (cl-format nil "{~{~a~^,~}}"
                args)
     '()))
 
-(defun ox-jira-make-adf-vector (&rest args)
+(defun ox-jira3-make-adf-vector (&rest args)
   "Create a json array as string"
   (if args
       (cl-format nil "[~{~a~^,~}]" args)
     "[]"))
 
-(defun ox-jira-make-adf-doc (&rest args)
+(defun ox-jira3-make-adf-doc (&rest args)
   "Create an ADF document structure in lisp,
 to be converted by json-encode."
   (let ((result 
@@ -234,21 +236,21 @@ to be converted by json-encode."
            "}[ \\n\\t]*{" "},{" 
            (replace-regexp-in-string
             "\n" ""
-            (ox-jira-make-adf-object
-             (ox-jira-make-adf-item 'version 1)
-             (ox-jira-make-adf-item 'type "doc")
-             (ox-jira-make-adf-item
-              'content (ox-jira-make-adf-vector
+            (ox-jira3-make-adf-object
+             (ox-jira3-make-adf-item 'version 1)
+             (ox-jira3-make-adf-item 'type "doc")
+             (ox-jira3-make-adf-item
+              'content (ox-jira3-make-adf-vector
                         (cl-format nil "~{~a~^,~}" args)))))))))
     (message (cl-format nil "~a" result))
     result))
 
-(defun ox-jira--fix-exporter-bug-with-emphasize-text (text-item)
+(defun ox-jira3--fix-exporter-bug-with-emphasize-text (text-item)
   "The Org exporter omits whitespace after emphasized text.
 Until this is fixed, add a whitespace to the emphasized text."
   (list (car text-item) (cons (cdar text-item) (concat (cdadr text-item) " "))))
 
-(defun ox-jira--not-implemented (element-type)
+(defun ox-jira3--not-implemented (element-type)
   "Replace anything we don't handle yet with a big red marker."
   (format "{color:red}Element of type '%s' not implemented!{color}" element-type))
 
@@ -257,7 +259,7 @@ Until this is fixed, add a whitespace to the emphasized text."
 ;; we have to fake it. This function makes simple text transforms
 ;; "embeddable" by preceding them with an empty anchor. 
 
-(defun ox-jira--text-transform-embeddable (transform-char contents)
+(defun ox-jira3--text-transform-embeddable (transform-char contents)
   (concat "{anchor}" transform-char contents transform-char))
 
 ;;; Filters
@@ -268,7 +270,7 @@ Until this is fixed, add a whitespace to the emphasized text."
 ;; "post-blank" after =items= (and =paragraphs= inside =items=) using
 ;; a filter.
 
-(defun ox-jira-fix-multi-paragraph-items (tree backend info)
+(defun ox-jira3-fix-multi-paragraph-items (tree backend info)
   "Remove extra blank line between paragraphs in plain-list items.
 
 TREE is the parse tree being exported.  BACKEND is the export
@@ -291,83 +293,83 @@ Assume BACKEND is `jira'."
 ;; Atlassian's Text Formatting Notation Help page as a reference, cf
 ;; https://jira.atlassian.com/secure/WikiRendererHelpAction.jspa?section=all
 
-(defun ox-jira-bold (bold contents info)
+(defun ox-jira3-bold (bold contents info)
   "Transcode BOLD from Org to JIRA.
 CONTENTS is the text with bold markup. INFO is a plist holding
 contextual information."
-  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+  (let ((obj (ox-jira3--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "strong"))]))))))
 
 ;; For CODE elements we cannot use the contents; it is always nil.
-(defun ox-jira-code (code _contents info)
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "text")
-   (ox-jira-make-adf-item 'text (cl-format nil "~a" (org-element-property :value code)))
-   (ox-jira-make-adf-item
+(defun ox-jira3-code (code _contents info)
+  (ox-jira3-make-adf-object
+   (ox-jira3-make-adf-item 'type "text")
+   (ox-jira3-make-adf-item 'text (cl-format nil "~a" (org-element-property :value code)))
+   (ox-jira3-make-adf-item
     'marks
-    (ox-jira-make-adf-vector
-     (ox-jira-make-adf-object 
-      (ox-jira-make-adf-item 'type "code"))))))
+    (ox-jira3-make-adf-vector
+     (ox-jira3-make-adf-object 
+      (ox-jira3-make-adf-item 'type "code"))))))
 
-(defun ox-jira-example-block (example-block _contents info)
+(defun ox-jira3-example-block (example-block _contents info)
   "Transcode an EXAMPLE-BLOCK element from Org to Jira.
 CONTENTS is nil.  INFO is a plist holding contextual
 information."
   (when (org-string-nw-p (org-element-property :value example-block))
-    (ox-jira-make-adf-object
-     (ox-jira-make-adf-item 'type "blockquote")
-     (ox-jira-make-adf-item
+    (ox-jira3-make-adf-object
+     (ox-jira3-make-adf-item 'type "blockquote")
+     (ox-jira3-make-adf-item
       'content
-      (ox-jira-make-adf-vector
-       (ox-jira-make-adf-object
-        (ox-jira-make-adf-item 'type "paragraph")
-        (ox-jira-make-adf-item
+      (ox-jira3-make-adf-vector
+       (ox-jira3-make-adf-object
+        (ox-jira3-make-adf-item 'type "paragraph")
+        (ox-jira3-make-adf-item
          'content
-         (ox-jira-make-adf-vector
-          (ox-jira-make-adf-object 
-           (ox-jira-make-adf-item 'type "text")
-           (ox-jira-make-adf-item 'text (ox-jira--intern-special-chars (org-export-format-code-default example-block info))))))))))))
+         (ox-jira3-make-adf-vector
+          (ox-jira3-make-adf-object 
+           (ox-jira3-make-adf-item 'type "text")
+           (ox-jira3-make-adf-item 'text (ox-jira3--intern-special-chars (org-export-format-code-default example-block info))))))))))))
 
-(defun ox-jira-fixed-width (fixed-width contents info)
+(defun ox-jira3-fixed-width (fixed-width contents info)
   "Transcode an FIXED-WIDTH element from Org to Jira.
 CONTENTS is nil.  INFO is a plist holding contextual
 information."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "text")
-   (ox-jira-make-adf-item 'text (cl-format nil "~a" contents))
-   (ox-jira-make-adf-item
+  (ox-jira3-make-adf-object
+   (ox-jira3-make-adf-item 'type "text")
+   (ox-jira3-make-adf-item 'text (cl-format nil "~a" contents))
+   (ox-jira3-make-adf-item
     'marks
-    (ox-jira-make-adf-vector
-     (ox-jira-make-adf-object
-      (ox-jira-make-adf-item 'type "code"))))))
+    (ox-jira3-make-adf-vector
+     (ox-jira3-make-adf-object
+      (ox-jira3-make-adf-item 'type "code"))))))
 
 ;;;; Footnotes
 
 ;; Footnotes have two parts: the reference, and the definition.
 
-(defun ox-jira--footnote-anchor (element)
+(defun ox-jira3--footnote-anchor (element)
   (let ((label (org-element-property :label element)))
     (replace-regexp-in-string ":" "" label)))
 
-(defun ox-jira--footnote-ref (anchor)
+(defun ox-jira3--footnote-ref (anchor)
   (replace-regexp-in-string "fn" "" anchor))
 
-(defun ox-jira-footnote-reference (footnote-reference contents info)
+(defun ox-jira3-footnote-reference (footnote-reference contents info)
   "Transcode an FOOTNOTE-REFERENCE element from Org to Jira.
 CONTENTS is nil.  INFO is a plist holding contextual
 information."
-  (let* ((anchor (ox-jira--footnote-anchor footnote-reference))
-         (ref (ox-jira--footnote-ref anchor)))
+  (let* ((anchor (ox-jira3--footnote-anchor footnote-reference))
+         (ref (ox-jira3--footnote-ref anchor)))
     (format "{anchor:fnr%s}[^%s^|#fn%s]"
             anchor ref anchor)))
 
-(defun ox-jira-footnote-definition (footnote-definition contents info)
+(defun ox-jira3-footnote-definition (footnote-definition contents info)
   "Transcode an FOOTNOTE-DEFINITION element from Org to Jira.
 CONTENTS is nil.  INFO is a plist holding contextual
 information."
-  (let* ((anchor (ox-jira--footnote-anchor footnote-definition))
-         (ref (ox-jira--footnote-ref anchor)))
+  (let* ((anchor (ox-jira3--footnote-anchor footnote-definition))
+         (ref (ox-jira3--footnote-ref anchor)))
     (format "{anchor:fn%s}[^%s^|#fnr%s] %s"
             anchor ref anchor contents)))
 
@@ -383,13 +385,13 @@ information."
 ;; first level= then the =** second level= will think it's a top-level
 ;; heading. That's a bit weird, but there you go.
 
-(defun ox-jira-headline (headline contents info)
+(defun ox-jira3-headline (headline contents info)
   "Transcode a HEADLINE element from Org to JIRA.
 CONTENTS is the contents of the headline, as a string.  INFO is
 the plist used as a communication channel."
-  (let* ((headline-info (if (eql ox-jira-override-headline-offset nil)
+  (let* ((headline-info (if (eql ox-jira3-override-headline-offset nil)
                             info
-                          (plist-put nil :headline-offset ox-jira-override-headline-offset)))
+                          (plist-put nil :headline-offset ox-jira3-override-headline-offset)))
          (level (org-export-get-relative-level headline headline-info))
          (title (org-export-data-with-backend
                  (org-element-property :title headline)
@@ -399,38 +401,38 @@ the plist used as a communication channel."
                       (and todo (org-export-data todo info)))))
          (todo-type (and todo (org-element-property :todo-type headline)))
          (todo-text (if todo
-                        (ox-jira-make-adf-object
-                         (ox-jira-make-adf-item 'type "text")
-                         (ox-jira-make-adf-item 'text todo)
-                         (ox-jira-make-adf-item
+                        (ox-jira3-make-adf-object
+                         (ox-jira3-make-adf-item 'type "text")
+                         (ox-jira3-make-adf-item 'text todo)
+                         (ox-jira3-make-adf-item
                           'marks
-                          (ox-jira-make-adf-vector
-                           (ox-jira-make-adf-item 'type "textColor")
-                           (ox-jira-make-adf-item
+                          (ox-jira3-make-adf-vector
+                           (ox-jira3-make-adf-item 'type "textColor")
+                           (ox-jira3-make-adf-item
                             'attrs
-                            (ox-jira-make-adf-object 
-                             (ox-jira-make-adf-item 'color (if (eq todo-type 'done)
+                            (ox-jira3-make-adf-object 
+                             (ox-jira3-make-adf-item 'color (if (eq todo-type 'done)
                                                          "#82ef6d"
                                                        "#e12057")))))))
                       "")))
-         (ox-jira-make-adf-object
-          (ox-jira-make-adf-item 'type "heading")
-          (ox-jira-make-adf-item
+         (ox-jira3-make-adf-object
+          (ox-jira3-make-adf-item 'type "heading")
+          (ox-jira3-make-adf-item
            'attrs
-           (ox-jira-make-adf-object 
-            (ox-jira-make-adf-item 'level level)))
-          (ox-jira-make-adf-item
+           (ox-jira3-make-adf-object 
+            (ox-jira3-make-adf-item 'level level)))
+          (ox-jira3-make-adf-item
            'content
-           (ox-jira-make-adf-vector
+           (ox-jira3-make-adf-vector
             (format "%s%s" todo-text (s-trim title)))))))
 
-(defun ox-jira-horizontal-rule (horizontal-rule contents info)
+(defun ox-jira3-horizontal-rule (horizontal-rule contents info)
   "Transcode a HORIZONTAL-RULE element from Org to JIRA."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "rule")))
+  (ox-jira3-make-adf-object
+   (ox-jira3-make-adf-item 'type "rule")))
 
-(defun ox-jira-italic (italic contents info)
-  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+(defun ox-jira3-italic (italic contents info)
+  (let ((obj (ox-jira3--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "em"))]))))))
 
@@ -453,23 +455,23 @@ the plist used as a communication channel."
 ;; JIRA doesn't really have support for definition lists, so we fake
 ;; it with a bullet list and some bold text for the term.
 
-(defun ox-jira--list-type-path (item)
+(defun ox-jira3--list-type-path (item)
   (when (and item (eq 'item (org-element-type item)))
     (let* ((list (org-element-property :parent item))
            (list-type (org-element-property :type list)))
-      (cons list-type (ox-jira--list-type-path
+      (cons list-type (ox-jira3--list-type-path
                        (org-element-property :parent list))))))
 
-(defun ox-jira--bullet-string (list-type-path)
+(defun ox-jira3--bullet-string (list-type-path)
   (apply 'string
          (mapcar (lambda (x) (if (eq x 'ordered) ?# ?*))
                  list-type-path)))
 
-(defun ox-jira-item (item contents info)
+(defun ox-jira3-item (item contents info)
   "Transcode ITEM from Org to JIRA.
 CONTENTS is the text with item markup. INFO is a plist holding
 contextual information."
-  (let* ((list-type-path (ox-jira--list-type-path item))
+  (let* ((list-type-path (ox-jira3--list-type-path item))
          (tag (let ((tag (org-element-property :tag item)))
                 (when tag
                   (org-export-data tag info))))
@@ -477,13 +479,13 @@ contextual information."
                      (on "(/)")
                      (off "(x)")
                      (trans "(i)"))))
-    (ox-jira-make-adf-object
-     (ox-jira-make-adf-item 'type "listItem")
-     (ox-jira-make-adf-item 
+    (ox-jira3-make-adf-object
+     (ox-jira3-make-adf-item 'type "listItem")
+     (ox-jira3-make-adf-item 
       'content
-      (ox-jira-make-adf-vector contents)))))
+      (ox-jira3-make-adf-vector contents)))))
 
-(defun ox-jira-radio-target (radio-target contents info)
+(defun ox-jira3-radio-target (radio-target contents info)
   "Transcode a RADIO-TARGET object from Org to JIRA.
 CONTENTS is nil. INFO is a plist holding contextual information."
   (let ((value (org-element-property :value radio-target)))
@@ -493,7 +495,7 @@ CONTENTS is nil. INFO is a plist holding contextual information."
 ;; all, but we must make a token effort. A lot of this code is cribbed
 ;; from =ox-latex.el=.
 
-(defun ox-jira-link (link desc info)
+(defun ox-jira3-link (link desc info)
   "Transcode a LINK object from Org to JIRA.
 
 DESC is the description part of the link, or the empty string.
@@ -520,80 +522,80 @@ INFO is a plist holding contextual information.  See
     (cond
      ;; account-ids are mentions
      ((string-prefix-p "~accountid" raw-path)
-      (ox-jira-make-adf-object
-       (ox-jira-make-adf-item 'type "mention")
-       (ox-jira-make-adf-item
+      (ox-jira3-make-adf-object
+       (ox-jira3-make-adf-item 'type "mention")
+       (ox-jira3-make-adf-item
         'attrs
-        (ox-jira-make-adf-object
-         (ox-jira-make-adf-item 'id (replace-regexp-in-string "~accountid:" "" path))
-         (ox-jira-make-adf-item 'text (concat "@" (alist-get 'text (json-read-from-string desc))))))))
+        (ox-jira3-make-adf-object
+         (ox-jira3-make-adf-item 'id (replace-regexp-in-string "~accountid:" "" path))
+         (ox-jira3-make-adf-item 'text (concat "@" (alist-get 'text (json-read-from-string desc))))))))
      (t
-      (ox-jira-make-adf-object
-       (ox-jira-make-adf-item 'type "text")
+      (ox-jira3-make-adf-object
+       (ox-jira3-make-adf-item 'type "text")
        (if desc
-           (ox-jira-make-adf-item 'text desc)
-         (ox-jira-make-adf-item 'text path))
-       (ox-jira-make-adf-item
+           (ox-jira3-make-adf-item 'text desc)
+         (ox-jira3-make-adf-item 'text path))
+       (ox-jira3-make-adf-item
         'marks
-        (ox-jira-make-adf-vector
-         (ox-jira-make-adf-object
-          (ox-jira-make-adf-item 'type "link")
-          (ox-jira-make-adf-item
+        (ox-jira3-make-adf-vector
+         (ox-jira3-make-adf-object
+          (ox-jira3-make-adf-item 'type "link")
+          (ox-jira3-make-adf-item
            'attrs
-           (ox-jira-make-adf-object
-            (ox-jira-make-adf-item 'href path)))))
+           (ox-jira3-make-adf-object
+            (ox-jira3-make-adf-item 'href path)))))
         t))))))
 
-(defun ox-jira-underline (underline contents info)
+(defun ox-jira3-underline (underline contents info)
   "Transcode UNDERLINE from Org to JIRA.
 CONTENTS is the text with underline markup. INFO is a plist holding
 contextual information."
-  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+  (let ((obj (ox-jira3--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "underline"))]))))))
 
-(defun ox-jira-verbatim (verbatim _contents info)
+(defun ox-jira3-verbatim (verbatim _contents info)
   "Transcode a VERBATIM object from Org to Jira.
 CONTENTS is nil.  INFO is a plist used as a communication
 channel."
-    (ox-jira-make-adf-object
-     (ox-jira-make-adf-item 'type "text")
-     (ox-jira-make-adf-item 'text (cl-format nil "~a" (org-element-property :value verbatim)))
-     (ox-jira-make-adf-item
+    (ox-jira3-make-adf-object
+     (ox-jira3-make-adf-item 'type "text")
+     (ox-jira3-make-adf-item 'text (cl-format nil "~a" (org-element-property :value verbatim)))
+     (ox-jira3-make-adf-item
       'marks
-      (ox-jira-make-adf-vector
-       (ox-jira-make-adf-object 
-        (ox-jira-make-adf-item 'type "code"))))))
+      (ox-jira3-make-adf-vector
+       (ox-jira3-make-adf-object 
+        (ox-jira3-make-adf-item 'type "code"))))))
 
 ;; One of the most annoying aspects of JIRA markup is its broken
 ;; handling of line breaks; any newlines in the source becomes hard
 ;; linebreaks in the rendered output. We need to replace /internal/
 ;; newlines (i.e. any not at the end of the string) with a space.
 
-(defun ox-jira-paragraph (paragraph contents info)
+(defun ox-jira3-paragraph (paragraph contents info)
   "Transcode a PARAGRAPH element from Org to JIRA.
 CONTENTS is the contents of the paragraph, as a string.  INFO is
 the plist used as a communication channel."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "paragraph")
-   (ox-jira-make-adf-item
+  (ox-jira3-make-adf-object
+   (ox-jira3-make-adf-item 'type "paragraph")
+   (ox-jira3-make-adf-item
     'content
-    (ox-jira-make-adf-vector
-     (ox-jira--unintern-special-chars contents))
+    (ox-jira3-make-adf-vector
+     (ox-jira3--unintern-special-chars contents))
     t )))
 
 ;; Lists are simple to support since all the complexity is in the code
 ;; for list item.
 
-(defun ox-jira-plain-list (plain-list contents info)
+(defun ox-jira3-plain-list (plain-list contents info)
   "Transcode PLAIN-LIST from Org to JIRA.
 CONTENTS is the text with plain-list markup. INFO is a plist holding
 contextual information."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "bulletList")
-   (ox-jira-make-adf-item
+  (ox-jira3-make-adf-object
+   (ox-jira3-make-adf-item 'type "bulletList")
+   (ox-jira3-make-adf-item
     'content
-    (ox-jira-make-adf-vector contents))))
+    (ox-jira3-make-adf-vector contents))))
 
 ;; This is text with no markup, but we have to escape certain
 ;; characters to avoid tripping up JIRA. In particular:
@@ -601,63 +603,63 @@ contextual information."
 ;; - ={= :: Introduces macros
 ;; - =[= :: Introduces links
 
-(defun ox-jira-plain-text (text info)
+(defun ox-jira3-plain-text (text info)
   "Transcode TEXT from Org to JIRA.
 TEXT is the string to transcode. INFO is a plist holding
 contextual information."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "text")
-   (ox-jira-make-adf-item 'text (ox-jira--unintern-special-chars text))))
+  (ox-jira3-make-adf-object
+   (ox-jira3-make-adf-item 'type "text")
+   (ox-jira3-make-adf-item 'text (ox-jira3--unintern-special-chars text))))
 
 ;; Paragraphs are grouped into sections. I've not found any mention in
 ;; the Org documentation, but it appears to be essential for any
 ;; export to happen. I've essentially cribbed this from =ox-latex.el=.
 
-(defun ox-jira-section (section contents info)
+(defun ox-jira3-section (section contents info)
   "Transcode a SECTION element from Org to JIRA.
 CONTENTS is the contents of the section, as a string.  INFO is
 the plist used as a communication channel."
-  (ox-jira-make-adf-doc contents))
+  (ox-jira3-make-adf-doc contents))
 
-;; If language is not member of =ox-jira-src-supported-languages=,
+;; If language is not member of =ox-jira3-src-supported-languages=,
 ;; =none=, will be used which I imagine will be a bit like
 ;; ={noformat}=.
 
-(defun ox-jira-src-block (src-block contents info)
+(defun ox-jira3-src-block (src-block contents info)
   "Transcode a SRC-BLOCK element from Org to Jira.
 CONTENTS holds the contents of the src-block.  INFO is a plist holding
 contextual information."
   (when (org-string-nw-p (org-element-property :value src-block))
     (let* ((title (apply #'concat (org-export-get-caption src-block)))
            (lang (org-element-property :language src-block))
-           (lang (if (member lang ox-jira-src-supported-languages) lang "none"))
+           (lang (if (member lang ox-jira3-src-supported-languages) lang "none"))
            (code (org-export-format-code-default src-block info)))
-      (ox-jira-make-adf-object 
-       (ox-jira-make-adf-item 'type "codeBlock")
-       (ox-jira-make-adf-item
+      (ox-jira3-make-adf-object 
+       (ox-jira3-make-adf-item 'type "codeBlock")
+       (ox-jira3-make-adf-item
         'attrs
-        (ox-jira-make-adf-object 
-         (ox-jira-make-adf-item 'language lang)))
-       (ox-jira-make-adf-item
+        (ox-jira3-make-adf-object 
+         (ox-jira3-make-adf-item 'language lang)))
+       (ox-jira3-make-adf-item
         'content
-        (ox-jira-make-adf-vector
-         (ox-jira-make-adf-object
-          (ox-jira-make-adf-item 'type "text")
-          (ox-jira-make-adf-item 'text (json-serialize (s-trim code)) t))))))))
+        (ox-jira3-make-adf-vector
+         (ox-jira3-make-adf-object
+          (ox-jira3-make-adf-item 'type "text")
+          (ox-jira3-make-adf-item 'text (json-serialize (s-trim code)) t))))))))
 
-(defun ox-jira-subscript (subscript contents info)
+(defun ox-jira3-subscript (subscript contents info)
   "Transcode SUBSCRIPT from Org to JIRA.
 CONTENTS is the text with subscript markup. INFO is a plist holding
 contextual information."
-  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+  (let ((obj (ox-jira3--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "subsup") (attrs (type . "sub")))]))))))
 
-(defun ox-jira-superscript (superscript contents info)
+(defun ox-jira3-superscript (superscript contents info)
   "Transcode SUPERSCRIPT from Org to JIRA.
 CONTENTS is the text with superscript markup. INFO is a plist holding
 contextual information."
-  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+  (let ((obj (ox-jira3--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "subsup") (attrs (type . "sup")))]))))))
 
@@ -682,36 +684,36 @@ contextual information."
 ;; Looks like most of the logic will live in the row and cell
 ;; transcoding functions.
 
-(defun ox-jira-table (table contents info)
+(defun ox-jira3-table (table contents info)
   "Transcode a TABLE element from Org to JIRA.
 CONTENTS holds the contents of the table.  INFO is a plist holding
 contextual information."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "table")
-   (ox-jira-make-adf-item
+  (ox-jira3-make-adf-object
+   (ox-jira3-make-adf-item 'type "table")
+   (ox-jira3-make-adf-item
     'content
-    (ox-jira-make-adf-vector contents))))
+    (ox-jira3-make-adf-vector contents))))
 
 ;; We only want to output =standard= rows, not horizontal lines. I'm
 ;; not sure if detection of header rows belong here or in the cells.
 
-(defun ox-jira-table-row (table-row contents info)
+(defun ox-jira3-table-row (table-row contents info)
   "Transcode a TABLE-ROW element from Org to JIRA.
 CONTENTS holds the contents of the table-row.  INFO is a plist holding
 contextual information."
   (when (eq 'standard (org-element-property :type table-row))
-    (ox-jira-make-adf-object
-     (ox-jira-make-adf-item 'type "tableRow")
-     (ox-jira-make-adf-item
+    (ox-jira3-make-adf-object
+     (ox-jira3-make-adf-item 'type "tableRow")
+     (ox-jira3-make-adf-item
       'content
-      (ox-jira-make-adf-vector contents)))))
+      (ox-jira3-make-adf-vector contents)))))
 
 ;; The cell itself does not know if it is a header cell or not, so we
 ;; have to ask its containing row if it is the first row, and the
 ;; table if it has a header row at all. If those things are true, make
 ;; the cell a header cell.
 
-(defun ox-jira-table-cell (table-cell contents info)
+(defun ox-jira3-table-cell (table-cell contents info)
   "Transcode a TABLE-CELL element from Org to JIRA.
 CONTENTS holds the contents of the table-cell.  INFO is a plist holding
 contextual information."
@@ -720,21 +722,21 @@ contextual information."
          (has-header (org-export-table-has-header-p table info))
          (group (org-export-table-row-group row info))
          (is-header (and has-header (eq 1 group))))
-    (ox-jira-make-adf-object
-     (ox-jira-make-adf-item 'type (if is-header "tableHeader" "tableCell"))
-     (ox-jira-make-adf-item
+    (ox-jira3-make-adf-object
+     (ox-jira3-make-adf-item 'type (if is-header "tableHeader" "tableCell"))
+     (ox-jira3-make-adf-item
       'content
-      (ox-jira-make-adf-vector
-       (ox-jira-make-adf-object 
-        (ox-jira-make-adf-item 'type "paragraph")
-        (ox-jira-make-adf-item
+      (ox-jira3-make-adf-vector
+       (ox-jira3-make-adf-object 
+        (ox-jira3-make-adf-item 'type "paragraph")
+        (ox-jira3-make-adf-item
          'content
-         (ox-jira-make-adf-vector 
+         (ox-jira3-make-adf-vector 
           (cl-format nil "~a" (if contents contents ""))))))))))
 
 ;; This is updated to show progress of subsequent list of check boxes.
 
-(defun ox-jira-statistics-cookie (statistics-cookie _contents _info)
+(defun ox-jira3-statistics-cookie (statistics-cookie _contents _info)
   "Transcode a STATISTICS-COOKIE object from Org to JIRA.
 CONTENTS is nil.  INFO is a plist holding contextual information."
   (format "\\%s" (org-element-property :value statistics-cookie)))
@@ -746,21 +748,21 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 ;; deleted text rather than have it clutter up things. Still, it's
 ;; simple to support, so we might as well do it.
 
-(defun ox-jira-strike-through (strike-through contents info)
+(defun ox-jira3-strike-through (strike-through contents info)
   "Transcode STRIKE-THROUGH from Org to JIRA.
 CONTENTS is the text with strike-through markup. INFO is a plist holding
 contextual information."
-  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+  (let ((obj (ox-jira3--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "strike"))]))))))
 
-(defun ox-jira-quote-block (quote-block contents info)
+(defun ox-jira3-quote-block (quote-block contents info)
   "Transcode a QUOTE-BLOCK element from Org to Jira.
 CONTENTS holds the contents of the block.  INFO is a plist
 holding contextual information."
   (format "{quote}\n%s{quote}" contents))
 
-(defun ox-jira-timestamp (timestamp _contents info)
+(defun ox-jira3-timestamp (timestamp _contents info)
   "Transcode a TIMESTAMP object from Org to JIRA.
 CONTENTS is nil. INFO is a plist holding contextual information."
   (let ((value (org-timestamp-translate timestamp))
@@ -771,7 +773,7 @@ CONTENTS is nil. INFO is a plist holding contextual information."
     (format fmt value)))
 
 ;;;###autoload
-(defun ox-jira-export-as-jira
+(defun ox-jira3-export-as-jira
     (&optional async subtreep visible-only body-only ext-plist)
   "Export current buffer as a Jira buffer.
 
@@ -805,6 +807,6 @@ is non-nil."
   (org-export-to-buffer 'jira "*Org JIRA Export*"
     async subtreep visible-only body-only ext-plist))
 
-(provide 'ox-jira)
+(provide 'ox-jira3)
 
-;;; ox-jira.el ends here
+;;; ox-jira3.el ends here
