@@ -310,18 +310,24 @@ contextual information."
      (ox-jira-make-adf-object 
       (ox-jira-make-adf-item 'type "code"))))))
 
-(defun ox-jira-example-block (example-block contents info)
+(defun ox-jira-example-block (example-block _contents info)
   "Transcode an EXAMPLE-BLOCK element from Org to Jira.
 CONTENTS is nil.  INFO is a plist holding contextual
 information."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "codeBlock")
-   (ox-jira-make-adf-item
-    'content
-    (ox-jira-make-adf-vector
-     (ox-jira-make-adf-object
-      (ox-jira-make-adf-item 'type "text")
-      (ox-jira-make-adf-item 'text (format "%s" contents)))))))
+  (when (org-string-nw-p (org-element-property :value example-block))
+    (ox-jira-make-adf-object
+     (ox-jira-make-adf-item 'type "blockquote")
+     (ox-jira-make-adf-item
+      'content
+      (ox-jira-make-adf-vector
+       (ox-jira-make-adf-object
+        (ox-jira-make-adf-item 'type "paragraph")
+        (ox-jira-make-adf-item
+         'content
+         (ox-jira-make-adf-vector
+          (ox-jira-make-adf-object 
+           (ox-jira-make-adf-item 'type "text")
+           (ox-jira-make-adf-item 'text (ox-jira--intern-special-chars (org-export-format-code-default example-block info))))))))))))
 
 (defun ox-jira-fixed-width (fixed-width contents info)
   "Transcode an FIXED-WIDTH element from Org to Jira.
@@ -637,7 +643,7 @@ contextual information."
         (ox-jira-make-adf-vector
          (ox-jira-make-adf-object
           (ox-jira-make-adf-item 'type "text")
-          (ox-jira-make-adf-item 'text (json-serialize code) t))))))))
+          (ox-jira-make-adf-item 'text (json-serialize (s-trim code)) t))))))))
 
 (defun ox-jira-subscript (subscript contents info)
   "Transcode SUBSCRIPT from Org to JIRA.
