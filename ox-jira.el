@@ -163,7 +163,7 @@ could set this to `2' to start headings at level 3."
     (underline . ox-jira-underline)
     (verbatim . ox-jira-verbatim)
     (verse-block . (lambda (&rest args) (ox-jira--not-implemented 'verse-block))))
-  :filters-alist '((:filter-parse-tree . ox-jira-fix-multi-paragraph-items))
+;;  :filters-alist '((:filter-parse-tree . ox-jira-fix-multi-paragraph-items))
   :options-alist '((:src-collapse-threshold nil nil ox-jira-src-collapse-threshold))
   :menu-entry
   '(?J "Export to JIRA"
@@ -209,10 +209,8 @@ This means replacing '\\n' with '\n' and '\\t' with '\t' and unescaping escaped 
          (eq key 'attrs)
          (numberp value)
          nowrap)
-         (cl-format nil  "\"~a\":~a" key (if (stringp value)
-                                             value ;(ox-jira--intern-special-chars value)
-                                           value)))
-        (t (cl-format nil  "\"~a\":\"~a\"" key (s-trim value)))))
+         (cl-format nil  "\"~a\":~a" key value))
+        (t (cl-format nil  "\"~a\":\"~a\"" key value))))
 
 (defun ox-jira-make-adf-object (&rest args)
   "Create a json object as string."
@@ -230,16 +228,25 @@ This means replacing '\\n' with '\n' and '\\t' with '\t' and unescaping escaped 
 (defun ox-jira-make-adf-doc (&rest args)
   "Create an ADF document structure in lisp,
 to be converted by json-encode."
-  (replace-regexp-in-string
-   "}[ \\n\\t]*{" "},{" 
-   (replace-regexp-in-string
-    "\n" ""
-    (ox-jira-make-adf-object
-     (ox-jira-make-adf-item 'version 1)
-     (ox-jira-make-adf-item 'type "doc")
-     (ox-jira-make-adf-item
-      'content (ox-jira-make-adf-vector
-                (cl-format nil "~{~a~^,~}" args)))))))
+  (let ((result 
+         (s-trim
+          (replace-regexp-in-string
+           "}[ \\n\\t]*{" "},{" 
+           (replace-regexp-in-string
+            "\n" ""
+            (ox-jira-make-adf-object
+             (ox-jira-make-adf-item 'version 1)
+             (ox-jira-make-adf-item 'type "doc")
+             (ox-jira-make-adf-item
+              'content (ox-jira-make-adf-vector
+                        (cl-format nil "~{~a~^,~}" args)))))))))
+    (message (cl-format nil "~a" result))
+    result))
+
+(defun ox-jira--fix-exporter-bug-with-emphasize-text (text-item)
+  "The Org exporter omits whitespace after emphasized text.
+Until this is fixed, add a whitespace to the emphasized text."
+  (list (car text-item) (cons (cdar text-item) (concat (cdadr text-item) " "))))
 
 (defun ox-jira--not-implemented (element-type)
   "Replace anything we don't handle yet with a big red marker."
@@ -288,7 +295,7 @@ Assume BACKEND is `jira'."
   "Transcode BOLD from Org to JIRA.
 CONTENTS is the text with bold markup. INFO is a plist holding
 contextual information."
-  (let ((obj (json-read-from-string contents)))
+  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "strong"))]))))))
 
@@ -417,7 +424,7 @@ the plist used as a communication channel."
    (ox-jira-make-adf-item 'type "rule")))
 
 (defun ox-jira-italic (italic contents info)
-  (let ((obj (json-read-from-string contents)))
+  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
     (json-encode
      (append obj '((marks . [((type . "em"))]))))))
 
@@ -512,8 +519,8 @@ INFO is a plist holding contextual information.  See
        (ox-jira-make-adf-item
         'attrs
         (ox-jira-make-adf-object
-         (ox-jira-make-adf-item 'id path)
-         (ox-jira-make-adf-item 'text (cl-format nil "@~a" desc))))))
+         (ox-jira-make-adf-item 'id (replace-regexp-in-string "~accountid:" "" path))
+         (ox-jira-make-adf-item 'text (concat "@" (alist-get 'text (json-read-from-string desc))))))))
      (t
       (ox-jira-make-adf-object
        (ox-jira-make-adf-item 'type "text")
@@ -535,27 +542,22 @@ INFO is a plist holding contextual information.  See
   "Transcode UNDERLINE from Org to JIRA.
 CONTENTS is the text with underline markup. INFO is a plist holding
 contextual information."
-  (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "text")
-   (ox-jira-make-adf-item 'text (cl-format nil "~a" contents))
-   (ox-jira-make-adf-item
-    'marks
-    (ox-jira-make-adf-vector
-     (ox-jira-make-adf-object 
-      (ox-jira-make-adf-item 'type "underline"))))))
+  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+    (json-encode
+     (append obj '((marks . [((type . "underline"))]))))))
 
 (defun ox-jira-verbatim (verbatim _contents info)
   "Transcode a VERBATIM object from Org to Jira.
 CONTENTS is nil.  INFO is a plist used as a communication
 channel."
     (ox-jira-make-adf-object
-   (ox-jira-make-adf-item 'type "text")
-   (ox-jira-make-adf-item 'text (cl-format nil "~a" (org-element-property :value verbatim)))
-   (ox-jira-make-adf-item
-    'marks
-    (ox-jira-make-adf-vector
-     (ox-jira-make-adf-object 
-      (ox-jira-make-adf-item 'type "code"))))))
+     (ox-jira-make-adf-item 'type "text")
+     (ox-jira-make-adf-item 'text (cl-format nil "~a" (org-element-property :value verbatim)))
+     (ox-jira-make-adf-item
+      'marks
+      (ox-jira-make-adf-vector
+       (ox-jira-make-adf-object 
+        (ox-jira-make-adf-item 'type "code"))))))
 
 ;; One of the most annoying aspects of JIRA markup is its broken
 ;; handling of line breaks; any newlines in the source becomes hard
@@ -571,7 +573,7 @@ the plist used as a communication channel."
    (ox-jira-make-adf-item
     'content
     (ox-jira-make-adf-vector
-     (ox-jira--unintern-special-chars (s-trim contents)))
+     (ox-jira--unintern-special-chars contents))
     t )))
 
 ;; Lists are simple to support since all the complexity is in the code
@@ -606,13 +608,8 @@ contextual information."
   "Transcode a SECTION element from Org to JIRA.
 CONTENTS is the contents of the section, as a string.  INFO is
 the plist used as a communication channel."
+  (message "Info: %s" info)
   (ox-jira-make-adf-doc contents))
-  ;; (ox-jira-make-adf-object
-  ;;  (ox-jira-make-adf-item 'type "paragraph")
-  ;;  (ox-jira-make-adf-item
-  ;;   'content
-  ;;   (ox-jira-make-adf-vector
-  ;;    contents))))
 
 ;; If language is not member of =ox-jira-src-supported-languages=,
 ;; =none=, will be used which I imagine will be a bit like
@@ -644,13 +641,17 @@ contextual information."
   "Transcode SUBSCRIPT from Org to JIRA.
 CONTENTS is the text with subscript markup. INFO is a plist holding
 contextual information."
-  (ox-jira--text-transform-embeddable "~" contents))
+  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+    (json-encode
+     (append obj '((marks . [((type . "subsup") (attrs (type . "sub")))]))))))
 
 (defun ox-jira-superscript (superscript contents info)
   "Transcode SUPERSCRIPT from Org to JIRA.
 CONTENTS is the text with superscript markup. INFO is a plist holding
 contextual information."
-  (ox-jira--text-transform-embeddable "^" contents))
+  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+    (json-encode
+     (append obj '((marks . [((type . "subsup") (attrs (type . "sup")))]))))))
 
 ;;;; Tables
 
@@ -725,7 +726,9 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   "Transcode STRIKE-THROUGH from Org to JIRA.
 CONTENTS is the text with strike-through markup. INFO is a plist holding
 contextual information."
-  (format "-%s-" contents))
+  (let ((obj (ox-jira--fix-exporter-bug-with-emphasize-text (json-read-from-string contents))))
+    (json-encode
+     (append obj '((marks . [((type . "strike"))]))))))
 
 (defun ox-jira-quote-block (quote-block contents info)
   "Transcode a QUOTE-BLOCK element from Org to Jira.
