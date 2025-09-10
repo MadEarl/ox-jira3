@@ -686,7 +686,11 @@ contextual information."
   "Transcode a TABLE element from Org to JIRA.
 CONTENTS holds the contents of the table.  INFO is a plist holding
 contextual information."
-  contents)
+  (ox-jira-make-adf-object
+   (ox-jira-make-adf-item 'type "table")
+   (ox-jira-make-adf-item
+    'content
+    (ox-jira-make-adf-vector contents))))
 
 ;; We only want to output =standard= rows, not horizontal lines. I'm
 ;; not sure if detection of header rows belong here or in the cells.
@@ -696,7 +700,11 @@ contextual information."
 CONTENTS holds the contents of the table-row.  INFO is a plist holding
 contextual information."
   (when (eq 'standard (org-element-property :type table-row))
-    (format "%s\n" contents)))
+    (ox-jira-make-adf-object
+     (ox-jira-make-adf-item 'type "tableRow")
+     (ox-jira-make-adf-item
+      'content
+      (ox-jira-make-adf-vector contents)))))
 
 ;; The cell itself does not know if it is a header cell or not, so we
 ;; have to ask its containing row if it is the first row, and the
@@ -711,10 +719,18 @@ contextual information."
          (table (org-element-property :parent row))
          (has-header (org-export-table-has-header-p table info))
          (group (org-export-table-row-group row info))
-         (is-header (and has-header (eq 1 group)))
-         (sep (if is-header "||" "|")))
-    (format "%s %s %s" sep (if contents contents "")
-            (if (org-export-last-sibling-p table-cell info) sep ""))))
+         (is-header (and has-header (eq 1 group))))
+    (ox-jira-make-adf-object
+     (ox-jira-make-adf-item 'type (if is-header "tableHeader" "tableCell"))
+     (ox-jira-make-adf-item
+      'content
+      (ox-jira-make-adf-vector
+       (ox-jira-make-adf-object 
+        (ox-jira-make-adf-item 'type "paragraph")
+        (ox-jira-make-adf-item
+         'content
+         (ox-jira-make-adf-vector 
+          (cl-format nil "~a" (if contents contents ""))))))))))
 
 ;; This is updated to show progress of subsequent list of check boxes.
 
