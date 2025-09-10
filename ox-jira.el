@@ -583,8 +583,11 @@ the plist used as a communication channel."
   "Transcode PLAIN-LIST from Org to JIRA.
 CONTENTS is the text with plain-list markup. INFO is a plist holding
 contextual information."
-  (message "Plain List: %s" contents)
-  contents)
+  (ox-jira-make-adf-object
+   (ox-jira-make-adf-item 'type "bulletList")
+   (ox-jira-make-adf-item
+    'content
+    (ox-jira-make-adf-vector contents))))
 
 ;; This is text with no markup, but we have to escape certain
 ;; characters to avoid tripping up JIRA. In particular:
@@ -608,7 +611,6 @@ contextual information."
   "Transcode a SECTION element from Org to JIRA.
 CONTENTS is the contents of the section, as a string.  INFO is
 the plist used as a communication channel."
-  (message "Info: %s" info)
   (ox-jira-make-adf-doc contents))
 
 ;; If language is not member of =ox-jira-src-supported-languages=,
