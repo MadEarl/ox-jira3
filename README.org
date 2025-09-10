@@ -2,12 +2,6 @@
 #+AUTHOR: Wolfgang Mederle
 #+Startup: indent
 
-* Notice
-
-This is a fork of Stig Brautaset's ox-jira, which I am working on to support Atlassian's Jira API v3. This API uses Atlassian Document Format instead of markup syntax.
-
-This is currently not a finished version, I am actively developing it, so, to put it simple: don't use yet. And ignore the rest of this README.
-
 
 * Introduction
 
