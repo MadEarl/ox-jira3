@@ -19,7 +19,7 @@ I am working with the module daily, but consider it alpha. Not everything is imp
 - verbatim and example blocks
 - links
 - mentions (via e. g. ejira3-mention-user, mentions require the person's ID)
-- plain lists (numbered are converted to plain)
+- plain lists (numbered are converted to plain), also nested
 - tables
   
 * Usage
@@ -52,7 +52,7 @@ I am working with the module daily, but consider it alpha. Not everything is imp
 
 * Maturity
 
-  It does what I want, and it has tests for that. YMMV.
+  It works as exporter for ejira3, that's my main use case. 
 
 * License
 
@@ -82,4 +82,6 @@ I am working with the module daily, but consider it alpha. Not everything is imp
   reproducible test case, like "I expected this but got this" is also a
   valuable contribution.
 
-  The tests are still testing for Jira markup syntax and will fail.
+  ^ I borrowed this from ox-jira, and it is a bit hypocritical in case
+  of ox-jira3, because the tests currently don't work at all; they are
+  left over from ox-jira, which creates Jira markup.
