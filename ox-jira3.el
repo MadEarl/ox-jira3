@@ -533,7 +533,7 @@ INFO is a plist holding contextual information.  See
       (ox-jira3-make-adf-object
        (ox-jira3-make-adf-item 'type "text")
        (if desc
-           (ox-jira3-make-adf-item 'text desc)
+           (ox-jira3-make-adf-item 'text (alist-get 'text (json-read-from-string desc)))
          (ox-jira3-make-adf-item 'text path))
        (ox-jira3-make-adf-item
         'marks
